@@ -208,13 +208,13 @@ fn (mut g Gen) gen_fn(fd FnDecl) ! {
 	// default parameter values: if the caller passed fewer args than this
 	// param's slot, evaluate the default and store it
 	for i, p in fd.params {
-		_ = p
 		if fd.variadic && i == fd.params.len - 1 {
 			continue
 		}
 		if i >= fd.has_defs.len || !fd.has_defs[i] {
 			continue
 		}
+		_ = p
 		slot := i + next
 		skip_l := g.new_label()
 		g.code << op_argc

@@ -424,7 +424,7 @@ fn gen_expr(mut ctx FuzzCtx, depth int, ty int) string {
 			n := 1 + ctx.rng.intn(3)
 			for i in 0..n {
 				e := gen_expr(mut ctx, depth - 1, 1)
-				parts << '"f${i}": ${e}'
+				parts << '"f' + i.str() + '": ' + e
 			}
 			return '{${parts.join(', ')}}'
 		}
