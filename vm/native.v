@@ -1137,7 +1137,6 @@ fn (mut v Vm) ensure_flags() {
 		return
 	}
 	v.flags = FlagArgs{ parsed: true }
-	mut consumed_value := false // the current flag took a separate value token
 	mut i := 0
 	for i < v.prog_args.len {
 		a := v.prog_args[i]

@@ -44,12 +44,25 @@ jobs:
         run: |
           curl -L -o v_windows.zip https://github.com/vlang/v/releases/latest/download/v_windows.zip
           unzip -o v_windows.zip -d /tmp/vwin
-          echo "/tmp/vwin/v" >> "$GITHUB_PATH"
-          v version
+          # GITHUB_PATH needs a Windows-style path on Windows runners;
+          # a POSIX path like /tmp/vwin/v is silently unusable in later steps.
+          echo "$(cygpath -w /tmp/vwin/v)" >> "$GITHUB_PATH"
+          /tmp/vwin/v/v.exe version
 
-      - name: Build toolchain
+      - name: Build toolchain (unix)
+        if: runner.os != 'Windows'
         shell: bash
         run: v -o ${{ matrix.binary }} .
+
+      - name: Build toolchain (windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          # Deterministic C backend: use the tcc bundled with the V zip
+          # (MSVC needs a vcvars environment that is not set up in bash).
+          TCC="$(cygpath -w /tmp/vwin/v/thirdparty/tcc/tcc.exe)"
+          v -cc "$TCC" -o ${{ matrix.binary }} .
+          ls -lh ${{ matrix.binary }}
 
       - name: Smoke test
         shell: bash
@@ -73,7 +86,7 @@ jobs:
       - name: Verify tag matches v.mod version
         run: |
           TAG="${GITHUB_REF#refs/tags/v}"
-          MOD_VERSION=$(grep -oP "version: '\\K[^\"]+" v.mod)
+          MOD_VERSION=$(grep -oP "version: '\\K[^\\\"]+" v.mod)
           if [ "$TAG" != "$MOD_VERSION" ]; then
             echo "::error::Tag version (v${TAG}) does not match v.mod version (${MOD_VERSION})"
             exit 1

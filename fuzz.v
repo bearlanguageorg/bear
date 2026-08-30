@@ -275,7 +275,7 @@ fn gen_fn(mut ctx FuzzCtx, fname string, depth int) string {
 fn gen_body(mut ctx FuzzCtx, depth int) string {
 	mut out := ''
 	n := ctx.rng.intn(6)
-	for i in 0..n {
+	for _ in 0..n {
 		out += gen_stmt(mut ctx, depth)
 	}
 	return out
@@ -392,7 +392,7 @@ fn gen_expr(mut ctx FuzzCtx, depth int, ty int) string {
 		4 { // array literal of ints
 			n := ctx.rng.intn(4)
 			mut parts := []string{}
-			for i in 0..n {
+			for _ in 0..n {
 				parts << gen_expr(mut ctx, depth - 1, 1)
 			}
 			return '[${parts.join(', ')}]'
@@ -441,7 +441,7 @@ fn gen_expr(mut ctx FuzzCtx, depth int, ty int) string {
 				h := ctx.rng.intn(ctx.helper.len)
 				np := ctx.helper_ar[h]
 				mut args := []string{}
-				for i in 0..np {
+				for _ in 0..np {
 					args << gen_expr(mut ctx, depth - 1, 1)
 				}
 				hname := ctx.helper[h]
@@ -458,7 +458,7 @@ fn gen_expr(mut ctx FuzzCtx, depth int, ty int) string {
 fn gen_params_decl(mut ctx FuzzCtx) string {
 	n := ctx.rng.intn(3)
 	mut parts := []string{}
-	for i in 0..n {
+	for _ in 0..n {
 		parts << fuzz_names[ctx.rng.intn(fuzz_names.len)]
 	}
 	return parts.join(', ')

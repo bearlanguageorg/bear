@@ -208,6 +208,7 @@ fn (mut g Gen) gen_fn(fd FnDecl) ! {
 	// default parameter values: if the caller passed fewer args than this
 	// param's slot, evaluate the default and store it
 	for i, p in fd.params {
+		_ = p
 		if fd.variadic && i == fd.params.len - 1 {
 			continue
 		}
@@ -887,7 +888,7 @@ fn (mut g Gen) gen_expr(e Expr) ! {
 		.ident {
 			// check if it's a constant — emit the right opcode for its literal kind
 			if e.name in g.consts {
-				cv := g.consts[e.name]
+				cv := g.consts[e.name] or { panic('codegen: constant "${e.name}" missing') }
 				match cv.kind {
 					.int_lit, .bool_lit {
 						g.code << op_push_i
